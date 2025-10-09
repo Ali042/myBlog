@@ -1,0 +1,98 @@
+{% extends "blog/base.html" %}
+
+{% block title %}{% if user_profile %}{{ user_profile.username }}{% else %}Profile{% endif %}{% endblock %}
+
+{% block content %}
+  <section class="panel" style="padding:18px;">
+    <div class="profile-header">
+      <div class="profile-avatar">
+        {% if user_profile and user_profile.profile and user_profile.profile.avatar %}
+          <img src="{{ user_profile.profile.avatar.url }}" alt="" />
+        {% else %}
+          <img src="https://i.pinimg.com/736x/00/7a/70/007a70e85bc1f051cc3120111f6b5f09.jpg" alt="" />
+        {% endif %}
+      </div>
+      <div>
+        <h2 class="profile-username">{% if user_profile %}{{ user_profile.username }}{% else %}Guest{% endif %}</h2>
+        <div class="stats">
+          <div><span class="num">{{ stats.posts }}</span> posts</div>
+          <div><span class="num">{{ stats.followers }}</span> followers</div>
+          <div><span class="num">{{ stats.following }}</span> following</div>
+        </div>
+        <div class="bio">
+          {% if user_profile and user_profile.profile and user_profile.profile.display_name %}
+            <div>{{ user_profile.profile.display_name }}</div>
+          {% endif %}
+          {% if user_profile and user_profile.profile and user_profile.profile.bio %}
+            <div class="muted">{{ user_profile.profile.bio }}</div>
+          {% endif %}
+          {% if user_profile and user_profile.profile and user_profile.profile.website %}
+            <div><a class="nav-link" href="{{ user_profile.profile.website }}" target="_blank" rel="noopener">{{ user_profile.profile.website }}</a></div>
+          {% endif %}
+          {% if user_profile %}<div>@{{ user_profile.username }}</div>{% endif %}
+        </div>
+      </div>
+      <div class="profile-actions">
+        {% if is_self %}
+          <a class="btn secondary" href="{% url 'profile_edit' %}">Edit profile</a>
+        {% else %}
+          {% if user_profile %}
+            <button class="btn secondary" id="follow-toggle" data-username="{{ user_profile.username }}">
+              {% if is_following %}Unfollow{% else %}Follow{% endif %}
+            </button>
+          {% endif %}
+        {% endif %}
+        <button class="btn secondary" id="followers-modal" data-username="{{ user_profile.username }}">Followers</button>
+        <button class="btn secondary" id="following-modal" data-username="{{ user_profile.username }}">Following</button>
+      </div>
+    </div>
+    <div class="highlights">
+      <div class="highlight">
+        <div class="ring"><img src="https://picsum.photos/100?1" alt="" /></div>
+        <div class="label">New</div>
+      </div>
+      <div class="highlight">
+        <div class="ring"><img src="https://picsum.photos/100?2" alt="" /></div>
+        <div class="label">Love</div>
+      </div>
+      <div class="highlight">
+        <div class="ring"><img src="https://picsum.photos/100?3" alt="" /></div>
+        <div class="label">Gym</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <a href="#grid" class="tab active">Posts</a>
+      <a href="#reels" class="tab">Reels</a>
+      <a href="#tags" class="tab">Tagged</a>
+    </div>
+    <div id="grid" class="grid" style="margin-top:10px;">
+      {% for post in posts %}
+        <a class="tile" href="{% url 'post_detail' post.pk %}">
+          <div class="title">{{ post.title }}</div>
+      {% empty %}
+        <div class="panel" style="grid-column:1/-1; padding:14px;">
+          <p>No posts yet.</p>
+        </div>
+      {% endfor %}
+  </section>
+
+  <!-- Modal for followers/following -->
+  <div id="follow-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">Followers</h3>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <p>Loading...</p>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+  <nav class="bottom-nav" aria-label="Bottom navigation">
+    <a href="/" class="{% if request.resolver_match.url_name == 'post_list' %}active{% endif %}">🏠</a>
+    <a href="/post/new/">➕</a>
+    <a href="/random/">🎲</a>
+    <a href="/profile/" class="active">👤</a>
+  </nav>

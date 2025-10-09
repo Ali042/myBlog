@@ -1,0 +1,48 @@
+  {% extends "blog/base.html" %}
+  
+  {% block title %}All Posts{% endblock %}
+  
+  {% block content %}
+   <section class="post-list">
+     {% for post in page_obj.object_list %}
+       <article class="panel post-card">
+         <div class="meta-row">
+           <div class="avatar" aria-hidden="true">{{ post.author|first|upper }}</div>
+           <div>
+             <h2 class="post-title"><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h2>
+             <div class="post-meta">{{ post.author }} • {{ post.created_at }}</div>
+           </div>
+         </div>
+         <div style="margin:10px 0; border-radius:10px; overflow:hidden; border:1px solid var(--border)">
+           <a href="{% url 'post_detail' post.pk %}">
+             <img src="https://i.pinimg.com/736x/00/7a/70/007a70e85bc1f051cc3120111f6b5f09.jpg" alt="{{ post.title }}" style="width:100%; height:auto; display:block;"/>
+           </a>
+         </div>
+         <p class="post-excerpt">{{ post.content|truncatewords:36 }}</p>
+         <div class="actions" role="group" aria-label="Post actions">
+           <button class="action-btn{% if request.user.is_authenticated and post.id in liked_ids %} active{% endif %}" data-like data-post-id="{{ post.id }}">
+             ❤️ <span class="count" data-like-count>{{ post.likes.count }}</span>
+           </button>
+           <a class="action-btn" href="{% url 'post_detail' post.pk %}#comments">💬 <span class="count">{{ post.comments.count }}</span></a>
+           <button class="action-btn" data-share data-url="{% url 'post_detail' post.pk %}">🔗 Paylaş</button>
+         </div>
+       </article>
+     {% empty %}
+       <div class="panel" style="padding:18px;">
+         <p>No posts yet.</p>
+       </div>
+     {% endfor %}
+   </section>
+
+   {% if page_obj.paginator.num_pages > 1 %}
+     <div class="panel" style="padding:12px; display:flex; gap:8px; justify-content:center; margin-top:12px;">
+       {% if page_obj.has_previous %}
+         <a class="nav-link" href="?{% if q %}q={{ q|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">← Previous</a>
+       {% endif %}
+       <span class="post-meta">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+       {% if page_obj.has_next %}
+         <a class="nav-link" href="?{% if q %}q={{ q|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Next →</a>
+       {% endif %}
+     </div>
+   {% endif %}
+  {% endblock %}

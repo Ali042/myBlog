@@ -1,0 +1,44 @@
+{% extends "blog/base.html" %}
+
+{% block title %}{% if mode == "followers" %}Followers{% elif mode == "following" %}Following{% endif %} - {{ target.username }}{% endblock %}
+
+{% block content %}
+  <section class="panel" style="padding:18px;">
+    <h2>{% if mode == "followers" %}Followers{% elif mode == "following" %}Following{% endif %} (@{{ target.username }})</h2>
+    <p class="post-meta">{{ target.profile.followers.count }} {% if mode == "followers" %}followers{% elif mode == "following" %}following{% endif %}</p>
+
+    {% if mode == "followers" %}
+      <ul style="list-style:none; padding:0; margin:0;">
+        {% for follow in followers %}
+          <li style="display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid var(--border);">
+            <div class="avatar">{{ follow.user.username|first|upper }}</div>
+            <div>
+              <a href="{% url 'profile_user' follow.user.username %}" class="nav-link">{{ follow.user.username }}</a>
+              {% if follow.user.profile.display_name %}
+                <div class="post-meta">{{ follow.user.profile.display_name }}</div>
+              {% endif %}
+            </div>
+          </li>
+        {% empty %}
+          <p>No followers yet.</p>
+        {% endfor %}
+      </ul>
+    {% elif mode == "following" %}
+      <ul style="list-style:none; padding:0; margin:0;">
+        {% for follow in following %}
+          <li style="display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid var(--border);">
+            <div class="avatar">{{ follow.target.username|first|upper }}</div>
+            <div>
+              <a href="{% url 'profile_user' follow.target.username %}" class="nav-link">{{ follow.target.username }}</a>
+              {% if follow.target.profile.display_name %}
+                <div class="post-meta">{{ follow.target.profile.display_name }}</div>
+              {% endif %}
+            </div>
+          </li>
+        {% empty %}
+          <p>Not following anyone yet.</p>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+{% endblock %}

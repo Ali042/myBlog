@@ -1,0 +1,33 @@
+{% extends "blog/base.html" %}
+  
+  {% block title %}New Post{% endblock %}
+  
+  {% block content %}
+  <article class="panel detail">
+    <h2>Create a new post</h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="spacer"></div>
+      <div>
+        {{ form.non_field_errors }}
+      </div>
+      <div style="display:grid; gap:12px;">
+        <div>
+          {{ form.title.errors }}
+          {{ form.title }}
+        </div>
+        <div>
+          {{ form.content.errors }}
+          {{ form.content }}
+        </div>
+        <div>
+          {{ form.image.errors }}
+          {{ form.image }}
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn" type="submit">Publish</button>
+      <a class="btn secondary" href="/">Cancel</a>
+    </form>
+  </article>
+  {% endblock %}
