@@ -1,13 +1,13 @@
-// Social-like front-end interactions for My Blog
+
 (function () {
   'use strict';
 
-  // THEME: persist light/dark using data-theme on <html>
+ 
   const root = document.documentElement;
   const THEME_KEY = 'myblog-theme';
   function applyTheme(theme) {
     if (theme === 'light') root.setAttribute('data-theme', 'light');
-    else root.removeAttribute('data-theme'); // default dark
+    else root.removeAttribute('data-theme'); 
   }
   const saved = localStorage.getItem(THEME_KEY);
   if (saved) applyTheme(saved);
@@ -23,11 +23,11 @@
       localStorage.setItem(THEME_KEY, next);
       themeToggle.textContent = next === 'light' ? '☀️' : '🌙';
     });
-    // initialize icon
+    
     themeToggle.textContent = root.getAttribute('data-theme') === 'light' ? '☀️' : '🌙';
   }
 
-  // Smooth in-page anchor scrolling
+  
   document.addEventListener('click', function (e) {
     const a = e.target.closest('a[href^="#"]');
     if (!a) return;
@@ -39,7 +39,7 @@
     }
   });
 
-  // DETAIL: copy current URL helper
+ 
   const copyBtn = document.querySelector('[data-action="copy-link"]');
   if (copyBtn) {
     copyBtn.addEventListener('click', async () => {
@@ -53,14 +53,14 @@
     });
   }
 
-  // CSRF helper (Django)
+  
   function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
   }
 
-  // PROFILE: follow/unfollow toggle
+ 
   const followBtn = document.getElementById('follow-toggle');
   if (followBtn) {
     followBtn.addEventListener('click', async () => {
@@ -77,7 +77,7 @@
         if (!res.ok) throw new Error('Failed');
         const data = await res.json();
         followBtn.textContent = data.following ? 'Unfollow' : 'Follow';
-        // Update followers count if present
+       
         const stats = document.querySelector('.stats');
         if (stats && typeof data.followers === 'number') {
           const followerChip = Array.from(stats.children).find((c) => c.textContent.includes('followers'));
@@ -92,7 +92,7 @@
     });
   }
 
-  // PROFILE: modal for followers/following
+  
   document.getElementById('followers-modal')?.addEventListener('click', () => openFollowModal('followers'));
   document.getElementById('following-modal')?.addEventListener('click', () => openFollowModal('following'));
 
@@ -111,7 +111,7 @@
     fetch(`/u/${username}/${type}/`)
       .then(res => res.text())
       .then(html => {
-        // Extract the list content from the response
+        
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
         const listContent = doc.querySelector('.modal-body ul') || doc.querySelector('ul');
@@ -123,7 +123,7 @@
       });
   }
 
-  // Modal close handlers
+  
   document.getElementById('modal-close')?.addEventListener('click', closeFollowModal);
   document.getElementById('follow-modal')?.addEventListener('click', (e) => {
     if (e.target.id === 'follow-modal') closeFollowModal();

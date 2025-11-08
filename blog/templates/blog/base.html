@@ -37,5 +37,49 @@
     </footer>
   </div>
   <script src="{% static 'blog/app.js' %}"></script>
+  <script>
+    (function(){
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+      }
+      const chatToggle = document.getElementById('chat-toggle');
+      const chatWidget = document.getElementById('chat-widget');
+      const chatClose = document.getElementById('chat-close');
+      const chatForm = document.getElementById('chat-form');
+      const chatInput = document.getElementById('chat-input');
+      const chatMessages = document.getElementById('chat-messages');
+      function showChat(){ if(!chatWidget) return; chatWidget.style.display='flex'; chatInput && chatInput.focus(); }
+      function hideChat(){ if(!chatWidget) return; chatWidget.style.display='none'; }
+      chatToggle && chatToggle.addEventListener('click', showChat);
+      chatClose && chatClose.addEventListener('click', hideChat);
+      function appendBubble(text, who){ if(!chatMessages) return; const row = document.createElement('div'); row.className = 'chat-row ' + who; const b = document.createElement('div'); b.className = 'bubble ' + who; b.textContent = text; row.appendChild(b); chatMessages.appendChild(row); chatMessages.scrollTop = chatMessages.scrollHeight; }
+      chatForm && chatForm.addEventListener('submit', async function(e){
+        e.preventDefault();
+        const msg = (chatInput && chatInput.value || '').trim();
+        if(!msg) return;
+        appendBubble(msg, 'user');
+        if (chatInput) chatInput.value = '';
+        try {
+          const res = await fetch('/chatbot/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': getCookie('csrftoken') || ''
+            },
+            body: JSON.stringify({ message: msg })
+          });
+          if(!res.ok) throw new Error('Request failed');
+          const data = await res.json();
+          appendBubble(data.reply || 'Cavab yoxdur', 'bot');
+        } catch(err){
+          appendBubble('Xəta baş verdi. Bir az sonra yenidən yoxlayın.', 'bot');
+          console.error('chatbot failed', err);
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
